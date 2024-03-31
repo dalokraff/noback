@@ -1,0 +1,11 @@
+mod = [
+	"noback"
+]
+
+package = [
+	"resource_packages/noback/noback"
+]
+
+lua = [
+	"scripts/mods/noback/*"
+]
