@@ -1,11 +1,9 @@
--- chunkname: @scripts/managers/backend/backend_interface_common.lua
-
 MyCommon = class(MyCommon)
 
 require("scripts/settings/equipment/weapon_skins")
 
 MyCommon.init = function (self)
-	-- self._backend_mirror = backend_mirror
+
 end
 
 MyCommon.ready = function (self)
@@ -727,10 +725,4 @@ MyCommon.commit_load_time_data = function (self, load_time_data)
 			players = collected_players,
 		},
 	}
-	-- local mirror = self._backend_mirror
-	-- local request_queue = mirror:request_queue()
-
-	-- request_queue:enqueue(request, function ()
-	-- 	print("Commit load time data")
-	-- end, false)
 end

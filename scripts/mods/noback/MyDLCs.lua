@@ -1,5 +1,3 @@
--- chunkname: @scripts/managers/backend_playfab/backend_interface_dlcs_playfab.lua
-
 MyDLCs = class(MyDLCs)
 
 MyDLCs.init = function (self, backend_mirror)
@@ -7,8 +5,6 @@ MyDLCs.init = function (self, backend_mirror)
 	self._backend_mirror = backend_mirror
 	self._last_id = 0
 	self._updating_dlc_ownership = false
-	-- self._owned_dlcs = backend_mirror:get_owned_dlcs()
-	-- self._platform_dlcs = backend_mirror:get_platform_dlcs()
     self._owned_dlcs = {}
     self._platform_dlcs = {}
 end
@@ -214,12 +210,5 @@ MyDLCs.updating_dlc_ownership = function (self)
 end
 
 MyDLCs.is_unreleased_career = function (self, career_name)
-	-- local title_data = self._backend_mirror:get_title_data()
-	-- local unreleased_careers = title_data.unreleased_careers
-
-	-- if unreleased_careers and string.find(unreleased_careers, career_name) then
-	-- 	return true
-	-- end
-
 	return false
 end

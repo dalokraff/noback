@@ -2,15 +2,6 @@ local mod = get_mod("noback")
 local SaveWeapon = get_mod("SaveWeapon")
 local GiveWeapon = get_mod("GiveWeapon")
 
--- Your mod code goes here.
--- https://vmf-docs.verminti.de
-
-
--- mod:hook(BackendManagerPlayFab, '_post_error', function (func, self, error_data, crashify_override, ignore_crashify)
-
---     return
--- end)
-
 mod:dofile("scripts/mods/noback/MyHeroAttributes")
 mod:dofile("scripts/mods/noback/MyTalents")
 mod:dofile("scripts/mods/noback/MyQuests")
@@ -23,7 +14,6 @@ mod:dofile("scripts/mods/noback/MyCommon")
 mod:dofile("scripts/mods/noback/MyLiveInterface")
 
 local DEFAULT_LOADOUTS = local_require("scripts/mods/noback/default_loadouts")
-
 
 local local_hero_attributes = {
     empire_soldier_career = 1,
@@ -183,7 +173,6 @@ mod.backend_interfaces = {
     live_events = MyLiveInterface_mod
 }
 
-
 -- bypass career unlock check in CareerSettings
 -- and for setting talent stuff
 for career_name, setting_data in pairs(CareerSettings) do
@@ -205,7 +194,9 @@ mod:hook(GameMechanismManager, 'refresh_mechanism_setting_for_title', function(f
     return
 end)
 
+--=================================================================
 --unlocks maps and difficulties
+--=================================================================
 mod:hook(UnlockManager, 'is_dlc_unlocked', function(func, ...)
     return true
 end)
@@ -221,9 +212,8 @@ end)
 mod:hook(ExtraDifficultyRequirements.kill_all_lords_on_legend, 'requirement_function', function(func, ...)
 	return true
 end)
--- ExtraDifficultyRequirements.kill_all_lords_on_legend.requirement_function = function(...)
--- 	return true
--- end
+--=================================================================
+--=================================================================
 
 --sets level so UI things can be unlocked
 mod:hook(ExperienceSettings, 'get_level', function(func, experience)
@@ -236,6 +226,9 @@ mod:hook(TitleLoadingUI, 'init', function(func, self, world, params, force_done)
     return func(self, world, params, true)
 end)
 
+--=================================================================
+--Hooks for BackendManagerPlayFab
+--=================================================================
 mod:hook(BackendManagerPlayFab, 'signin', function (func, self, authentication_token)
     GameSettingsDevelopment.use_backend = false
     GameSettingsDevelopment.backend_settings.allow_local = false
@@ -254,7 +247,6 @@ mod:hook(BackendManagerPlayFab, 'signin', function (func, self, authentication_t
 
     return func(self, authentication_token)
 end)
-
 
 mod:hook(BackendManagerPlayFab, 'signed_in', function (func, self)
     return true
@@ -305,6 +297,30 @@ mod:hook(BackendManagerPlayFab, 'get_talents_interface', function (func, self)
     return self._interfaces.talents
 end)
 
+mod:hook(BackendManagerPlayFab, 'stop_tutorial', function(func, self)
+	self._interfaces.items = {}
+	self._script_backend_items_backup = nil
+	self._interfaces.hero_attributes = {}
+	self._script_backend_hero_attributes_backup = nil
+	self._is_tutorial_backend = false
+	return
+end)
+
+--needed for playing callback at end of match without "waiting" for Playfab backend's response
+mod:hook(BackendManagerPlayFab, 'commit', function(func, self, skip_queue, commit_complete_callback)
+    if not self._backend_mirror then
+        if type(commit_complete_callback) =='function' then
+            commit_complete_callback('no error')
+        end
+        return
+    end
+
+    return func(self, skip_queue, commit_complete_callback)
+end)
+--=================================================================
+--=================================================================
+--=================================================================
+
 mod:hook(PlayerManager, 'add_player', function(func, self, input_source, viewport_name, viewport_world_name, local_player_id)
     if script_data.network_debug_connections then
 		printf("PlayerManager:add_player %s", tostring(viewport_name))
@@ -326,7 +342,6 @@ mod:hook(PlayerManager, 'add_player', function(func, self, input_source, viewpor
 	player_table[peer_id] = player_table[peer_id] or {}
 	player_table[peer_id][local_player_id] = player
 
-	-- local stats = Managers.backend:get_interface("statistics"):get_stats()
     local stats = {}
 
 	self._statistics_db:register(player:stats_id(), "player", stats)
@@ -351,34 +366,10 @@ mod:hook(BackendUtils, 'has_loot_chest', function()
 	return false
 end)
 
-mod:hook(BackendManagerPlayFab, 'stop_tutorial', function(func, self)
-	self._interfaces.items = {}
-	self._script_backend_items_backup = nil
-	self._interfaces.hero_attributes = {}
-	self._script_backend_hero_attributes_backup = nil
-	self._is_tutorial_backend = false
-	return
-end)
-
---needed for playing callback at end of match without "waiting" for Playfab backend's response
-mod:hook(BackendManagerPlayFab, 'commit', function(func, self, skip_queue, commit_complete_callback)
-	mod:echo('BackendManagerPlayFab commiter '..tostring(commit_complete_callback))
-    mod:echo(self._backend_mirror)
-
-    if not self._backend_mirror then
-        if type(commit_complete_callback) =='function' then
-            commit_complete_callback('no error')
-        end
-        return
-    end
-
-    return func(self, skip_queue, commit_complete_callback)
-end)
-
+--prevents loading paintings in local keep
 mod:hook(KeepDecorationPaintingExtension, 'get_selected_decoration', function(func, self)
 	return DefaultPaintings[1]
 end)
-
 mod:hook(KeepDecorationPaintingExtension, '_set_selected_painting', function(func, self, painting)
 	return
 end)
@@ -400,21 +391,16 @@ mod:hook(StartGameStateSettingsOverview, 'is_weekly_event_active', function(func
 	return false
 end)
 
-
-mod:hook(BackendInterfaceDLCsPlayfab, 'update_dlc_ownership', function(func, self)
-    mod:echo("update_dlc_ownership")
-    return func(self)
-end)
-
 mod:hook(PlayerUtils, 'get_talent_overrides_by_career', function(func, career_name)
-
     return
 end)
 
+--prevents crashing other players when loading into the keep; due to sending painting info
 mod:hook(KeepDecorationSystem, 'rpc_request_painting', function(func, self, channel_id)
     self.network_transmit:send_rpc_server("rpc_send_painting", "hor_none")
     return
 end)
 
+--disables auto starting prologue on load in
 script_data.settings.disable_tutorial_at_start = true
 script_data.disable_prologue = true

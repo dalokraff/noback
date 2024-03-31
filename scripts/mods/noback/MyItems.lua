@@ -1,4 +1,3 @@
--- chunkname: @scripts/managers/backend_playfab/backend_interface_item_playfab.lua
 local mod = get_mod("noback")
 
 MyItems = class(MyItems)
@@ -9,7 +8,6 @@ MyItems.init = function (self, init_items)
 	self._loadouts = {}
 	self._items = init_items
 	self._game_mode_specific_items = {}
-	-- self._backend_mirror = backend_mirror
 	self._modified_templates = {}
 	self._last_id = 0
 	self._delete_deeds_request = {}
@@ -38,10 +36,9 @@ MyItems._refresh = function (self)
 	self:_unmark_favorites()
 end
 
+--this function was modeled off the same one from MoreItemsLibrary
 local MoreItemsLibrary = get_mod("MoreItemsLibrary")
 local function mocked_backend_get_all_inventory_items()
-
-
 	local backend_items = {}
 
 	if MoreItemsLibrary then
@@ -71,44 +68,7 @@ local function mocked_backend_get_all_inventory_items()
 end
 
 MyItems._refresh_items = function (self)
-	-- local backend_mirror = self._backend_mirror
 	local items = mocked_backend_get_all_inventory_items()
-	-- local unlocked_weapon_skins = backend_mirror:get_unlocked_weapon_skins()
-	-- local unlocked_cosmetics = backend_mirror:get_unlocked_cosmetics()
-
-	-- for _, item in pairs(items) do
-	-- 	if not item.bypass_skin_ownership_check and item.skin and not unlocked_weapon_skins[item.skin] then
-	-- 		item.skin = nil
-	-- 	end
-	-- end
-
-	-- if self._active_game_mode_specific_items then
-		-- self._items = table.clone(items)
-
-		-- for key, item in pairs(self._active_game_mode_specific_items) do
-		-- 	self._items[key] = item
-		-- end
-	-- else
-	-- 	self._items = items
-	-- end
-
-	-- local fake_items = backend_mirror:get_all_fake_inventory_items()
-
-	-- self._fake_items = fake_items
-
-	-- local new_backend_ids = ItemHelper.get_new_backend_ids()
-
-	-- if new_backend_ids then
-	-- 	for backend_id, _ in pairs(new_backend_ids) do
-	-- 		if not items[backend_id] then
-	-- 			ItemHelper.unmark_backend_id_as_new(backend_id, true)
-	-- 		end
-	-- 	end
-
-	-- 	-- Managers.save:auto_save(SaveFileName, SaveData, nil)
-	-- end
-
-
 	for key, item in pairs(items) do
 		if not self._items[key] then
 			self._items[key] = item
@@ -132,8 +92,6 @@ end
 
 MyItems._refresh_loadouts = function (self)
 	local loadouts = self._loadouts
-	-- local backend_mirror = self._backend_mirror
-
 	for career_name, settings in pairs(CareerSettings) do
 		if settings.playfab_name then
 			for i = 1, #loadout_slots do
@@ -268,9 +226,6 @@ MyItems.get_item_from_id = function (self, backend_id)
 end
 
 MyItems.get_backend_id_from_cosmetic_item = function (self, item_name)
-	-- local unlocked_cosmetics = self._backend_mirror:get_unlocked_cosmetics()
-
-	-- return unlocked_cosmetics[item_name]
     return {}
 end
 
@@ -353,9 +308,6 @@ MyItems.get_loadout_item_id = function (self, career_name, slot_name)
 	local item_id = loadout and loadout[slot_name]
 
 	if CosmeticUtils.is_cosmetic_slot(slot_name) and item_id then
-		-- local cosmetics = self._backend_mirror:get_unlocked_cosmetics()
-
-		-- return cosmetics[item_id]
         return {}
 	end
 
@@ -411,7 +363,6 @@ MyItems.set_loadout_item = function (self, item_id, career_name, slot_name)
 		item_id = item.override_id or item.ItemId
 	end
 
-	-- self._backend_mirror:set_character_data(career_name, slot_name, item_id)
 	slot_key = career_name..slot_name
 	if slot_key then
 		if item_id then
@@ -425,13 +376,10 @@ MyItems.set_loadout_item = function (self, item_id, career_name, slot_name)
 end
 
 MyItems.add_steam_items = function (self, item_list)
-	-- self._backend_mirror:add_steam_items(item_list)
 	self:_refresh_items()
 end
 
 MyItems.get_unseen_item_rewards = function (self)
-	-- local unseen_rewards_json = self._backend_mirror:get_user_data("unseen_rewards")
-
 	if not unseen_rewards_json then
 		return nil
 	end
@@ -608,13 +556,6 @@ MyItems.get_item_template = function (self, item_data, backend_id)
 end
 
 MyItems.sum_best_power_levels = function (self)
-	-- local debug_value = script_data.sum_of_best_power_levels_override
-
-	-- if debug_value then
-	-- 	return debug_value
-	-- else
-	-- 	return self._backend_mirror.sum_best_power_levels
-	-- end
     return 650
 end
 
@@ -672,47 +613,10 @@ MyItems.delete_marked_deeds = function (self, deeds_list, start_index, end_index
 		id = id,
 	}
 	local success_callback = callback(self, "delete_marked_deeds_request_cb", data, end_index, start_index, deeds_list)
-	-- local request_queue = self._backend_mirror:request_queue()
-
-	-- request_queue:enqueue(delete_marked_deeds_request, success_callback, true)
 end
 
 MyItems.delete_marked_deeds_request_cb = function (self, data, end_index, start_index, deeds_list, result)
-	-- local function_result = result.FunctionResult
-	-- local item_revokes = function_result.item_revokes
-	-- local backend_mirror = self._backend_mirror
 
-	-- if not function_result then
-	-- 	Managers.backend:playfab_api_error(result)
-
-	-- 	return
-	-- elseif function_result.error_message == "no_items_received" then
-	-- 	Managers.backend:playfab_error(BACKEND_PLAYFAB_ERRORS.ERR_REMOVE_DEEDS_NO_ITEMS_RECEIVED)
-
-	-- 	return
-	-- end
-
-	-- if item_revokes then
-	-- 	for i = 1, #item_revokes do
-	-- 		local revoke = item_revokes[i]
-	-- 		local item_instance_id = revoke.ItemInstanceId
-
-	-- 		backend_mirror:remove_item(item_instance_id)
-	-- 	end
-	-- end
-
-	-- local num_elements = #deeds_list
-
-	-- if end_index < num_elements then
-	-- 	local next_start_index = start_index + DEEDS_CHUNK_LIMIT
-	-- 	local next_end_index = end_index + DEEDS_CHUNK_LIMIT
-
-	-- 	self:delete_marked_deeds(deeds_list, next_start_index, next_end_index)
-	-- else
-	-- 	self._is_deleting_deeds = false
-
-	-- 	Managers.backend:dirtify_interfaces()
-	-- end
 end
 
 MyItems.is_deleting_deeds = function (self)

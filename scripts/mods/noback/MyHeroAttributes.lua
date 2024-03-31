@@ -26,13 +26,10 @@ local DEFAULT_CHARACTER_ATTRIBUTES = {
 	career = 1,
 }
 
-MyHeroAttributes.init = function (self, attributes)--, backend_mirror)
+MyHeroAttributes.init = function (self, attributes)
 	self._attributes = attributes
 	self._attributes_to_save = {}
-	-- self._backend_mirror = backend_mirror
-
 	self:_refresh()
-
 	self._initialized = true
 end
 
@@ -41,38 +38,10 @@ MyHeroAttributes.make_dirty = function (self)
 end
 
 MyHeroAttributes._refresh = function (self)
-	-- table.clear(self._attributes)
 
-	-- local mirror = self._backend_mirror
-
-	-- if script_data.honduras_demo then
-	-- 	for attribute_name, default_value in pairs(DEFAULT_DEMO_ATTRIBUTES) do
-	-- 		self._attributes[attribute_name] = default_value
-	-- 	end
-	-- else
-	-- 	for attribute_name, default_value in pairs(DEFAULT_READ_ONLY_ATTRIBUTES) do
-	-- 		local backend_value = mirror:get_read_only_data(attribute_name)
-
-	-- 		self._attributes[attribute_name] = backend_value or default_value
-	-- 	end
-	-- end
-
-	-- local characters_data = mirror:get_characters_data()
-	-- local attributes = self._attributes
-
-	-- for character, data in pairs(characters_data) do
-	-- 	for attribute_name, default_value in pairs(DEFAULT_CHARACTER_ATTRIBUTES) do
-	-- 		local key = string.format("%s_%s", character, attribute_name)
-
-	-- 		attributes[key] = data[attribute_name] or default_value
-	-- 	end
-	-- end
-
-	-- self._dirty = false
 end
 
 MyHeroAttributes.ready = function (self)
-	-- return self._initialized
     return true
 end
 
@@ -91,17 +60,5 @@ MyHeroAttributes.get = function (self, hero, attribute)
 end
 
 MyHeroAttributes.set = function (self, hero, attribute, value)
-	-- fassert(value ~= nil, "Trying to set a hero attribute to nil, don't do this")
 
-	-- local mirror = self._backend_mirror
-
-	-- if DEFAULT_CHARACTER_ATTRIBUTES[attribute] then
-	-- 	mirror:set_career_read_only_data(hero, attribute, value, nil, false)
-	-- else
-	-- 	local key = hero .. "_" .. attribute
-
-	-- 	mirror:set_read_only_data(key, value, true)
-	-- end
-
-	-- self._dirty = true
 end

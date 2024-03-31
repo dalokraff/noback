@@ -1,5 +1,3 @@
--- chunkname: @scripts/managers/backend_playfab/backend_interface_peddler_playfab.lua
-
 require("scripts/utils/steam_item_service")
 
 MyNews = class(MyNews)
@@ -13,7 +11,6 @@ local NON_FATAL_ERROR_CODES = {
 }
 
 MyNews.init = function (self)
-	-- self._backend_mirror = backend_mirror
 	self._peddler_stock = {}
 	self._chips = {}
 	self._app_prices = {}
@@ -25,13 +22,6 @@ MyNews.init = function (self)
 	self._steam_item_prices = {}
 	self._login_rewards_cooldown = 0
 	self._is_done_claiming = true
-
-	-- self:refresh_stock()
-	-- self:refresh_chips()
-	-- self:refresh_layout_override(true)
-	-- self:refresh_app_prices()
-	-- self:refresh_platform_item_prices()
-	-- self:refresh_login_rewards()
 end
 
 MyNews.ready = function (self)

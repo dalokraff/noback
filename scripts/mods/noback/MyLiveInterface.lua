@@ -1,17 +1,12 @@
--- chunkname: @scripts/managers/backend_playfab/backend_interface_live_events_playfab.lua
-
 MyLiveInterface = class(MyLiveInterface)
 
 MyLiveInterface.init = function (self, backend_mirror)
 	self.is_local = false
-	-- self._backend_mirror = backend_mirror
 	self._last_id = 0
 	self._live_events = {}
 	self._completed_live_event_requests = {}
 
 	local backend_manager = Managers.backend
-	-- local live_events_string = backend_manager:get_title_data("live_events_v2") or backend_manager:get_title_data("live_events")
-	-- local live_events = live_events_string and cjson.decode(live_events_string) or {}
     local live_events = {}
 
 	if is_array(live_events) then
@@ -39,17 +34,6 @@ end
 
 MyLiveInterface.request_live_events = function (self)
 	local id = self:_new_id()
-	-- local request = {
-	-- 	FunctionName = "getLiveEvents",
-	-- 	FunctionParameter = {
-	-- 		id = id,
-	-- 	},
-	-- }
-	-- local success_callback = callback(self, "request_live_events_cb", id)
-	-- local request_queue = self._backend_mirror:request_queue()
-
-	-- request_queue:enqueue(request, success_callback, false)
-
 	return id
 end
 
@@ -100,27 +84,9 @@ MyLiveInterface.get_weekly_events_game_mode_data = function (self)
 end
 
 MyLiveInterface.request_twitch_app_access_token = function (self, cb)
-	-- local request = {
-	-- 	FunctionName = "getTwitchAccessToken",
-	-- 	FunctionParameter = {
-	-- 		force = true,
-	-- 	},
-	-- }
-	-- local success_callback = callback(self, "_request_twitch_app_access_token_cb", cb)
-	-- local request_queue = self._backend_mirror:request_queue()
 
-	-- request_queue:enqueue(request, success_callback, false)
 end
 
 MyLiveInterface._request_twitch_app_access_token_cb = function (self, cb, result)
-	-- local function_result = result.FunctionResult
-	-- local access_token = function_result.access_token
 
-	-- if access_token then
-	-- 	self._backend_mirror:set_twitch_app_access_token(access_token)
-	-- end
-
-	-- if cb then
-	-- 	cb(access_token)
-	-- end
 end

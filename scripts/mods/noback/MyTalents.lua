@@ -1,9 +1,7 @@
--- chunkname: @scripts/managers/backend_playfab/backend_interface_talents_playfab.lua
 local mod = get_mod("noback")
 MyTalents = class(MyTalents)
 
 MyTalents.init = function (self, talents)
-	-- self._backend_mirror = backend_mirror
 	self._talents = {}
 
 	self:_refresh()
@@ -11,10 +9,8 @@ end
 
 MyTalents._refresh = function (self)
 	local talents = self._talents
-	-- local backend_mirror = self._backend_mirror
 
 	for career_name, settings in pairs(CareerSettings) do
-		-- local talent_string = backend_mirror:get_character_data(career_name, "talents")
 		local career_key = career_name.."talents"
 		if career_key then
 			local talent_string = mod:get(career_key)
@@ -53,7 +49,6 @@ MyTalents._validate_talents = function (self, career_name, career_talents, talen
 	end
 
 	local profile_name = profile.display_name
-	-- local hero_experience = self._backend_mirror:get_read_only_data(profile_name .. "_experience")
 	local hero_experience = 999999
 	local hero_level = ExperienceSettings.get_level(hero_experience)
 	local override_talents = PlayerUtils.get_talent_overrides_by_career(career_name)
@@ -65,7 +60,6 @@ MyTalents._validate_talents = function (self, career_name, career_talents, talen
 		local selected_talent = career_talents[i]
 
 		if selected_talent > 0 then
-			-- if not ProgressionUnlocks.is_unlocked("talent_point_" .. i, hero_level) then
 			if false then
 				career_talents[i] = 0
 				changed = true
@@ -105,7 +99,7 @@ MyTalents.get_talent_ids = function (self, career_name)
 	local talent_ids = {}
 	local talents = self:get_talents(career_name)
 
-	if talents then
+	if talents and talent_tree then
 		for i = 1, #talents do
 			local column = talents[i]
 
@@ -145,7 +139,6 @@ MyTalents.set_talents = function (self, career_name, talents)
 		end
 	end
 
-	-- self._backend_mirror:set_character_data(career_name, "talents", talent_string)
 	local career_key = career_name.."talents"
 	if career_key then
 		mod:set(career_key, talent_string)
