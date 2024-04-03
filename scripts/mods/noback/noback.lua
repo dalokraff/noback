@@ -175,10 +175,23 @@ mod.backend_interfaces = {
 
 -- bypass career unlock check in CareerSettings
 -- and for setting talent stuff
+-- checks steam for ownership of dlc careers
+local carrer_appid = {
+	es_questingknight = Steam.owns_app(1343500),
+	wh_priest = Steam.owns_app(1782450),
+	dr_engineer = Steam.owns_app(1443780),
+	bw_necromancer = Steam.owns_app(2585630),
+	we_thornsister = Steam.owns_app(1629000),
+}
 for career_name, setting_data in pairs(CareerSettings) do
 
-    mod:hook(setting_data, 'is_unlocked_function', function(func, ...)
-        return true
+    mod:hook(setting_data, 'is_unlocked_function', function(func, career, ...)
+        local career_name = career.name
+		local unlocked = carrer_appid[career_name]
+		if unlocked ~= nil then
+			return unlocked
+		end
+		return true
     end)
 
 	local init_loadout = DEFAULT_LOADOUTS[career_name]
@@ -196,15 +209,38 @@ end)
 
 --=================================================================
 --unlocks maps and difficulties
+--checks steam for ownership of WoM, BtU, and Bogen map packs
 --=================================================================
-mod:hook(UnlockManager, 'is_dlc_unlocked', function(func, ...)
-    return true
+local dlc_name_to_appid = {
+	scorpion = Steam.owns_app(1033060), --wom
+	holly = Steam.owns_app(975400), --btu
+	bogenhafen = Steam.owns_app(828790),--bogen
+	penny = true, --drachen
+	wizards_part_1 = true,
+	wizards_part_2 = true,
+	carousel = true, --versus
+	karak_azgaraz_part_1 = true,
+	karak_azgaraz_part_2 = true,
+	karak_azgaraz_part_3 = true,
+	morris = true, --chaos wastes
+}
+mod:hook(UnlockManager, 'is_dlc_unlocked', function(func, self, name)
+    local unlocked = dlc_name_to_appid[name]
+	if not unlocked then
+		return unlocked
+	end
+	return true
 end)
 mod:hook(LevelUnlockUtils, 'level_unlocked', function(func,...)
     return true
 end)
-mod:hook(StartGameStateSettingsOverview, 'is_difficulty_approved', function(func,...)
-    return true
+mod:hook(StartGameStateSettingsOverview, 'is_difficulty_approved', function(func, self, difficulty_key)
+    local difficulty_settings = DifficultySettings[difficulty_key]
+	if difficulty_settings.dlc_requirement then
+		mod:echo(difficulty_settings.dlc_requirement)
+		return Managers.unlock:is_dlc_unlocked(difficulty_settings.dlc_requirement)
+	end
+	return true
 end)
 mod:hook(BulldozerPlayer, "best_aquired_power_level", function(func, ...)
 	return 9001
@@ -404,3 +440,16 @@ end)
 --disables auto starting prologue on load in
 script_data.settings.disable_tutorial_at_start = true
 script_data.disable_prologue = true
+
+-- mod:hook(StartGameWindowLobbyBrowser, '_create_filter_requirements', function (func, self)
+-- 	local result = func(self)
+-- 	result['filters']['eac_authorized'] = nil
+-- 	result['free_slots'] = 0
+-- 	-- local tisch = cjson.encode(result)
+-- 	-- mod:echo(tisch)
+-- 	return result
+-- end)
+
+-- mod:hook(StartGameWindowLobbyBrowser, '_valid_lobby', function (func, self, lobby_data)
+-- 	return true
+-- end)
