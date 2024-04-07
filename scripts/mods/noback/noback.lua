@@ -237,7 +237,6 @@ end)
 mod:hook(StartGameStateSettingsOverview, 'is_difficulty_approved', function(func, self, difficulty_key)
     local difficulty_settings = DifficultySettings[difficulty_key]
 	if difficulty_settings.dlc_requirement then
-		mod:echo(difficulty_settings.dlc_requirement)
 		return Managers.unlock:is_dlc_unlocked(difficulty_settings.dlc_requirement)
 	end
 	return true
