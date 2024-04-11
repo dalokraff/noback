@@ -303,6 +303,10 @@ mod:hook(BackendManagerPlayFab, 'get_interface', function(func, self, interface_
             SaveWeapon:load_items()
         end
 
+		if interface_name == "talents" then
+			mod.backend_interfaces[interface_name] = MyTalents:new(local_talents)
+		end
+
 		return mod.backend_interfaces[interface_name]
 	end
 
@@ -327,7 +331,9 @@ mod:hook(BackendManagerPlayFab, 'set_talents_interface_override', function (func
 end)
 
 mod:hook(BackendManagerPlayFab, 'get_talents_interface', function (func, self)
-    self._interfaces.talents = MyTalents:new(local_talents)
+    if not self._interfaces.talents then
+		self._interfaces.talents = MyTalents:new(local_talents)
+	end
 
     return self._interfaces.talents
 end)
