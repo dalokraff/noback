@@ -189,9 +189,9 @@ for career_name, setting_data in pairs(CareerSettings) do
         local career_name = career.name
 		local unlocked = carrer_appid[career_name]
 		if unlocked ~= nil then
-			return unlocked
+			return unlocked, "noback_placeholder"
 		end
-		return true
+		return true, "noback_placeholder"
     end)
 
 	local init_loadout = DEFAULT_LOADOUTS[career_name]
