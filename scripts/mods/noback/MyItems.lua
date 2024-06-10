@@ -302,6 +302,14 @@ MyItems.get_loadout_by_career_name = function (self, career_name)
 	return self._loadouts[career_name]
 end
 
+MyItems.get_selected_career_loadout = function (self, career_name)
+	if self._dirty then
+		self:_refresh()
+	end
+
+	return self._loadouts[career_name]
+end
+
 MyItems.get_loadout_item_id = function (self, career_name, slot_name)
 	local loadouts = self:get_loadout()
 	local loadout = loadouts[career_name]
